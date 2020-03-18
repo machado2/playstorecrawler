@@ -1,17 +1,17 @@
+let repo = require("./Repository.js")
+let crawler = require("./Crawler.js")
 
-async function testPackage(pclient, packageId) {
-    console.log(await pclient.get(packageId));
+async function main() {
+    await crawler.crawl()
 }
 
-async function test() {
-    let PClient = require('./PlaystoreClient.js');
-    const pup = require('puppeteer');
-    const browser = await pup.launch();
-    let pclient = new PClient(browser);
-    testPackage(pclient, 'com.chanel.weather.forecast.accu');
-    testPackage(pclient, 'com.king.candycrushsaga');
-}
+// ensure there is at least one id on the database
+repo.insertIds(["com.king.candycrushsaga"])
 
-test().then(data =>{
-    console.log(data);
-});
+setInterval(function() {
+    main().then(function() {
+
+    }, function (error) {
+        console.log(error)
+    })
+}, 10000)
