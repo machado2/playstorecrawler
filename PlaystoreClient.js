@@ -1,3 +1,5 @@
+// this file isn't used, replaced by google-play-scraper
+
 const pup = require('puppeteer');
 
 function buildUrl(packageId) {

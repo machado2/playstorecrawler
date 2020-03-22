@@ -1,54 +1,41 @@
 let repo = require("./Repository.js")
-let PlaystoreClient = require("./PlaystoreClient")
-let browser = null
-let pclient = null
+let gplay = require('google-play-scraper');
 
-async function getBrowser() {
-    if (browser === null) {
-        const pup = require('puppeteer');
-        browser = await pup.launch();
-        return browser
-    }
-}
-
-async function getClient() {
-    if (pclient === null) {
-        pclient = new PlaystoreClient(await getBrowser())
-    }
-    return pclient
-}
-
-exports.crawl = async function() {
-    let oldest = await repo.getOldest()
-    let client = await getClient()
-    let id = oldest.packageId
+exports.crawl = async function () {
+    const oldest = await repo.getOldest()
+    const id = oldest.appId
     console.log("updating " + id)
     try {
-        data = await client.get(id)
-        repo.insertIds(data.linkedApps)
-        repo.update(data.app)
+        const data = await gplay.app({ appId: id });
+        const similar = (await gplay.similar({ appId: id }))
+            .map(function (a) {
+                return a.appId;
+            });
+        repo.insertIds(similar);
+        repo.update(data);
     } catch (error) {
         repo.moveToEnd(id)
         throw error
     }
 }
 
-exports.seed = async function() {
-    const client = await getClient();
-    const categories = await client.getCategories();
-    console.log("seeding");
-    for (let cat of categories) {
-        console.log("category " + cat);
-        const ids = await client.getIdsCategory(cat);
-        console.log("ids ");
-        console.log(ids);
-        repo.insertIds(ids);
+exports.seed = async function () {
+    for (let kcat in gplay.category) {
+        for (let kcol in gplay.collection) {
+            let cat = gplay.category[kcat];
+            let col = gplay.collection[kcol];
+            try {
+                console.log(cat + " - " + col);
+                list = [...new Set((await gplay.list({ category: cat, collection: col, throttle: 1 }))
+                    .map(function (app) {
+                        return app.appId;
+                    }))];
+                console.log(list);
+                repo.insertIds(list);
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
     console.log("ended seeding");
-}
-
-exports.close = function() {
-    if (browser != null) {
-        browser.close();
-    }
 }

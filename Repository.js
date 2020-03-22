@@ -28,7 +28,7 @@ async function getPackageList() {
   let db = await getDb()
   let col = db.collection("packageList")
   col.createIndex({
-    packageId : 1
+    appId : 1
   }, {
     unique : true
   })
@@ -44,9 +44,9 @@ exports.insertIds = async function (list) {
     // not sure why some ids came truncated in a dot
     if (!id.endsWith(".")) {
       packs.updateOne({
-        packageId: id,
+        appId: id,
       }, { 
-        $set: { packageId : id }
+        $set: { appId : id }
       },  { 
         upsert: true 
       })
@@ -56,8 +56,9 @@ exports.insertIds = async function (list) {
 
 exports.update = async function (package) {
   let packs = await getPackageList()
+  package.lastUpdated = new Date();
   packs.updateOne({
-    packageId: package.packageId,
+    appId: package.appId,
   }, { 
     $set: package
   },  { 
@@ -68,7 +69,7 @@ exports.update = async function (package) {
 exports.moveToEnd = async function (id) {
   let packs = await getPackageList()
   packs.updateOne({
-    packageId: id,
+    appId: id,
   }, { 
     $set: { lastUpdated: new Date() }
   },  { 
@@ -79,7 +80,7 @@ exports.moveToEnd = async function (id) {
 exports.get = async function(id) {
   let packs = await getPackageList()
   return packs.findOne({
-    packageId : id
+    appId : id
   })
 }
 

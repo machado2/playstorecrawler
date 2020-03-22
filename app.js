@@ -7,4 +7,4 @@ function crawl() {
     });
 }
 
-setInterval(crawl, 10000);
+setInterval(crawl, 5000);
