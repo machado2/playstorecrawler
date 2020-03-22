@@ -11,10 +11,10 @@ exports.crawl = async function () {
             .map(function (a) {
                 return a.appId;
             });
-        repo.insertIds(similar);
-        repo.update(data);
+        await repo.insertIds(similar);
+        await repo.update(data);
     } catch (error) {
-        repo.moveToEnd(id)
+        await repo.moveToEnd(id)
         throw error
     }
 }
