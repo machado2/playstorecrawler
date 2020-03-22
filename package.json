@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "express": "^4.17.1",
     "google-play-scraper": "^7.1.2",
     "mongodb": "^3.5.5",
     "mongodb-extjson": "^3.0.3",

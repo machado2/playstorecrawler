@@ -81,6 +81,27 @@ exports.get = async function (id) {
   })
 }
 
+exports.stats = async function() {
+  let packs = await getPackageList()
+  return {
+    known : await packs.countDocuments(),
+    processed : await packs.find({ lastUpdated : { $ne : null} }).count(),
+    noiapgames: await (await this.noiapgames()).count(),
+    reallyFreeGames: await (await this.reallyFreeGames()).count(),
+    games: await packs.find({ genreId : { $regex : /^GAME/ }}).count()
+  }
+}
+
+exports.reallyFreeGames = async function() {
+  let packs = await getPackageList()
+  return await packs.find({ genreId : { $regex : /^GAME/ }, offersIAP : false, adSupported : false, price : 0 })
+}
+
+exports.noiapgames = async function() {
+  let packs = await getPackageList()
+  return await packs.find({ genreId : { $regex : /^GAME/ }, offersIAP : false, adSupported : false })
+}
+
 exports.getOldest = async function () {
   let packs = await getPackageList()
   let data = await packs.find().sort({ lastUpdated: 1 }).limit(1).toArray()

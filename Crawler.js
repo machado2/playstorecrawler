@@ -23,17 +23,19 @@ exports.seed = async function () {
     for (let kcat in gplay.category) {
         for (let kcol in gplay.collection) {
             let cat = gplay.category[kcat];
-            let col = gplay.collection[kcol];
-            try {
-                console.log(cat + " - " + col);
-                list = [...new Set((await gplay.list({ category: cat, collection: col, throttle: 1 }))
-                    .map(function (app) {
-                        return app.appId;
-                    }))];
-                console.log(list);
-                repo.insertIds(list);
-            } catch (e) {
-                console.log(e);
+            if (cat.startsWith("GAME")) {
+                let col = gplay.collection[kcol];
+                try {
+                    console.log(cat + " - " + col);
+                    list = [...new Set((await gplay.list({ category: cat, collection: col, throttle: 1 }))
+                        .map(function (app) {
+                            return app.appId;
+                        }))];
+                    console.log(list);
+                    repo.insertIds(list);
+                } catch (e) {
+                    console.log(e);
+                }
             }
         }
     }

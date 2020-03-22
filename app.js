@@ -7,6 +7,7 @@ function crawl() {
         })
         .catch(function (error) {
             console.log(error);
+            setTimeout(crawl, 500);
         })
 }
 
