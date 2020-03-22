@@ -49,36 +49,52 @@ async function getLinkedApps(page) {
     let links = await page.evaluate(() => {
         return [...document.getElementsByTagName("a")].map(function (el) { return el.href; });
     });
-    return [...new Set(links.filter(function(str) { 
-        return str.indexOf("details?id=") >= 0; 
-    }).map(function (s) { 
-        return s.match(/id=([A-Za-z0-9\.]*)/)[1];
-    }))];
+    const filtrado = links.filter(function (str) {
+        return str.startsWith("https://play.google.com/store/apps/details?id=");
+    });
+    const ids = filtrado.map(function (s) {
+        return s.match(/id=([^=]*)$/)[1]
+    });
+    return [...new Set(ids)];
+}
+
+async function getName(page) {
+    return await page.evaluate(() => {
+        return document.getElementsByTagName("h1")[0].textContent;
+    });
 }
 
 function PlaystoreClient(browser) {
     this.browser = browser;
 }
 
-PlaystoreClient.prototype.get = async function get(packageId) {
+PlaystoreClient.prototype.getPage = async function(url) {
+    const page = await this.browser.newPage();
     try {
-        const browser = await pup.launch();
-        let url = buildUrl(packageId);
-        const page = await browser.newPage();
-        var data = null;
-        try {
-            await page.setRequestInterception(true);
-            page.on('request', request => {
-                if (request.resourceType() === 'image')
-                    request.abort();
-                else
-                    request.continue();
-            });
-            await page.goto(url);
+        await page.setRequestInterception(true);
+        page.on('request', request => {
+            if (request.resourceType() === 'image')
+                request.abort();
+            else
+                request.continue();
+        });
+        await page.goto(url);
+        return page;
+    } catch (e) {
+        page.close();
+        throw e;
+    }
+}
 
-            data = {
+PlaystoreClient.prototype.get = async function(packageId) {
+    try {
+        let url = buildUrl(packageId);
+        const page = await this.getPage(url);
+        try {
+            return {
                 app: {
                     packageId: packageId,
+                    name: await getName(page),
                     description: await getDescription(page),
                     containsAds: await getContainsAds(page),
                     containsIap: await getContainsIap(page),
@@ -92,10 +108,38 @@ PlaystoreClient.prototype.get = async function get(packageId) {
         } finally {
             await page.close();
         }
-        return data;
     } catch {
         console.log("fail to parse " + packageId);
         return null;
+    }
+}
+
+PlaystoreClient.prototype.getCategories = async function () {
+    const url = "https://play.google.com/store/apps?hl=en_US";
+    const page = await this.getPage(url);
+    try {
+        const links = await page.evaluate(() => {
+            return [...document.getElementsByTagName("a")].map(function (el) { return el.href; });
+        });
+        const filtrado = links.filter(function (str) {
+            return str.startsWith("https://play.google.com/store/apps/category/");
+        });
+        const ids = filtrado.map(function (s) {
+            return s.match(/([^\/]*)$/)[1];
+        });
+        return [...new Set(ids)];
+    } finally {
+        page.close();
+    }
+}
+
+PlaystoreClient.prototype.getIdsCategory = async function (category) {
+    const url = "https://play.google.com/store/apps/category/" + category;
+    const page = await this.getPage(url);
+    try {
+        return await getLinkedApps(page);
+    } finally {
+        page.close();
     }
 }
 

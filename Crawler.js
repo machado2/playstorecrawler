@@ -29,5 +29,26 @@ exports.crawl = async function() {
         repo.update(data.app)
     } catch (error) {
         repo.moveToEnd(id)
+        throw error
+    }
+}
+
+exports.seed = async function() {
+    const client = await getClient();
+    const categories = await client.getCategories();
+    console.log("seeding");
+    for (let cat of categories) {
+        console.log("category " + cat);
+        const ids = await client.getIdsCategory(cat);
+        console.log("ids ");
+        console.log(ids);
+        repo.insertIds(ids);
+    }
+    console.log("ended seeding");
+}
+
+exports.close = function() {
+    if (browser != null) {
+        browser.close();
     }
 }

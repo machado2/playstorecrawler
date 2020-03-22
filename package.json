@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "google-play-scraper": "^7.1.2",
     "mongodb": "^3.5.5",
     "mongodb-extjson": "^3.0.3",
     "puppeteer": "^2.1.1",

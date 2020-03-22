@@ -6,7 +6,7 @@ let db = null
 async function connect() {
   const conf = await config.getConfig();
   return await new Promise(function (resolve, reject) {
-    const client = new MongoClient(conf.connectionUrl);
+    const client = new MongoClient(conf.connectionUrl, { useUnifiedTopology: true});
     client.connect(function(err) {
       if (err != null) {
         reject(err);
@@ -42,7 +42,7 @@ exports.insertIds = async function (list) {
   let packs = await getPackageList()
   for (let id of list) {
     // not sure why some ids came truncated in a dot
-    if (id.endsWith(".")) {
+    if (!id.endsWith(".")) {
       packs.updateOne({
         packageId: id,
       }, { 
