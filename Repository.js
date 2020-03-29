@@ -81,25 +81,35 @@ exports.get = async function (id) {
   })
 }
 
-exports.stats = async function() {
+exports.stats = async function () {
   let packs = await getPackageList()
   return {
-    known : await packs.countDocuments(),
-    processed : await packs.find({ lastUpdated : { $ne : null} }).count(),
+    known: await packs.countDocuments(),
+    processed: await packs.find({ lastUpdated: { $ne: null } }).count(),
     noiapgames: await (await this.noiapgames()).count(),
     reallyFreeGames: await (await this.reallyFreeGames()).count(),
-    games: await packs.find({ genreId : { $regex : /^GAME/ }}).count()
+    games: await packs.find({ genreId: { $regex: /^GAME/ } }).count()
   }
 }
 
-exports.reallyFreeGames = async function() {
+exports.reallyFreeGames = async function () {
   let packs = await getPackageList()
-  return await packs.find({ genreId : { $regex : /^GAME/ }, offersIAP : false, adSupported : false, price : 0 })
+  return await packs.find({
+    genreId: { $regex: /^GAME/ }, offersIAP: false, adSupported: false, price: 0,
+    score: { $gt: 4.5 },
+    reviews: { $gt: 1000 },
+    description: { $not: /account/ }
+  })
 }
 
-exports.noiapgames = async function() {
+exports.noiapgames = async function () {
   let packs = await getPackageList()
-  return await packs.find({ genreId : { $regex : /^GAME/ }, offersIAP : false, adSupported : false })
+  return await packs.find({
+    genreId: { $regex: /^GAME/ }, offersIAP: false, adSupported: false,
+    score: { $gt: 4.5 },
+    reviews: { $gt: 1000 },
+    description: { $not: /account/ }
+  }).limit(100)
 }
 
 exports.getOldest = async function () {

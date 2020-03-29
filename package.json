@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "google-play-scraper": "^7.1.2",
     "mongodb": "^3.5.5",
-    "mongodb-extjson": "^3.0.3"
+    "mongodb-extjson": "^3.0.3",
+    "ng-image-slider": "^2.4.1"
   },
   "devDependencies": {
     "why-is-node-running": "^2.1.2"
