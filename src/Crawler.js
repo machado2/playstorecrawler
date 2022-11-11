@@ -25,7 +25,7 @@ exports.crawl = async function () {
     const id = oldest.appId
     console.log("updating " + id)
     try {
-        const data = await gplay.app({ appId: id });
+        let data = await gplay.app({ appId: id });
         const similar = (await gplay.similar({ appId: id }))
             .map(function (a) {
                 return a.appId;
