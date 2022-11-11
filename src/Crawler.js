@@ -14,6 +14,7 @@ exports.crawl = async function () {
         await repo.insertIds(similar);
         await repo.update(data);
     } catch (error) {
+        console.error(error)
         await repo.moveToEnd(id)
         throw error
     }
@@ -23,7 +24,7 @@ exports.seed = async function () {
     for (let kcat in gplay.category) {
         for (let kcol in gplay.collection) {
             let cat = gplay.category[kcat];
-            if (cat.startsWith("GAME")) {
+            // if (cat.startsWith("GAME")) {
                 let col = gplay.collection[kcol];
                 try {
                     console.log(cat + " - " + col);
@@ -36,7 +37,7 @@ exports.seed = async function () {
                 } catch (e) {
                     console.log(e);
                 }
-            }
+            // }
         }
     }
     console.log("ended seeding");
