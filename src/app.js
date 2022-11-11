@@ -1,14 +1,11 @@
 let crawler = require("./Crawler.js")
 
-function crawl() {
-    crawler.crawl()
-        .then(function () {
-            setTimeout(crawl, 500);
-        })
-        .catch(function (error) {
-            console.log(error);
-            setTimeout(crawl, 500);
-        })
+async function crawl() {
+    try {
+        await crawler.crawl()
+    } catch(e) {
+        console.log(e)
+    }
 }
 
-crawl();
+setInterval(crawl, 5000)
