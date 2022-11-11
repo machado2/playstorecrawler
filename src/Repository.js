@@ -114,7 +114,7 @@ exports.noiapgames = async function () {
 
 exports.getOldest = async function () {
   let packs = await getPackageList()
-  let data = await packs.find().sort({ lastUpdated: 1 }).limit(1).toArray()
+  let data = await packs.find({ i: null}).sort({ lastUpdated: 1 }).limit(1).toArray()
   if (data.length > 0)
     return data[0];
   else

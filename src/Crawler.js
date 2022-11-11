@@ -1,6 +1,25 @@
 let repo = require("./Repository.js")
 let gplay = require('google-play-scraper');
 
+function shouldIgnore(app) {
+    if (!app?.genreId?.startsWith("GAME")) {
+        return true
+    }
+    if (app?.offersIAP || app?.adSupported) {
+        return true
+    }
+    if (app?.score < 3) {
+        return true
+    }
+    if (app?.reviews < 1000) {
+        return true
+    }
+    if (app.description.includes('account')) {
+        return true
+    }
+    return false
+}
+
 exports.crawl = async function () {
     const oldest = await repo.getOldest()
     const id = oldest.appId
@@ -12,6 +31,10 @@ exports.crawl = async function () {
                 return a.appId;
             });
         await repo.insertIds(similar);
+        if (shouldIgnore(data)) {
+            data = { appId: data.appId, i: true }
+            console.log(data.appId + ' filtered out')
+        }
         await repo.update(data);
     } catch (error) {
         console.error(error)
