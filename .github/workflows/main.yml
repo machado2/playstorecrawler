@@ -1,0 +1,31 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        TAG: $(date +%s)
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: Build the crawling service
+      run: docker build . --file Dockerfile.crawler --tag ${{secrets.DOCKER_USER}}/playstorecrawler:$(date +%s)
+    - name: Push crawling service
+      run: docker push ${{secrets.DOCKER_USER}}/playstorecrawler
+    - name: Build the api image
+      run: docker build . --file Dockerfile.web --tag ${{secrets.DOCKER_USER}}/playstoreapi:$(date +%s)
+    - name: Push api service
+      run: docker push ${{secrets.DOCKER_USER}}/playstoreapi
