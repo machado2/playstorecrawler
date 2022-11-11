@@ -22,10 +22,10 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the crawling service
-      run: docker build . --file Dockerfile.crawler --tag ${{secrets.DOCKER_USER}}/playstorecrawler:$(date +%s)
+      run: docker build . --file Dockerfile.crawler --tag ${{secrets.DOCKER_USER}}/playstorecrawler
     - name: Push crawling service
       run: docker push ${{secrets.DOCKER_USER}}/playstorecrawler
     - name: Build the api image
-      run: docker build . --file Dockerfile.web --tag ${{secrets.DOCKER_USER}}/playstoreapi:$(date +%s)
+      run: docker build . --file Dockerfile.web --tag ${{secrets.DOCKER_USER}}/playstoreapi
     - name: Push api service
       run: docker push ${{secrets.DOCKER_USER}}/playstoreapi
