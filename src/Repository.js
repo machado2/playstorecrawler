@@ -96,8 +96,8 @@ exports.reallyFreeGames = async function () {
   let packs = await getPackageList()
   return await packs.find({
     genreId: { $regex: /^GAME/ }, offersIAP: false, adSupported: false, price: 0,
-    score: { $gt: 4.5 },
-    reviews: { $gt: 1000 },
+    score: { $gt: 4.0 },
+    reviews: { $gt: 10 },
     description: { $not: /account/ }
   })
 }
@@ -106,8 +106,8 @@ exports.noiapgames = async function () {
   let packs = await getPackageList()
   return await packs.find({
     genreId: { $regex: /^GAME/ }, offersIAP: false, adSupported: false,
-    score: { $gt: 4.5 },
-    reviews: { $gt: 1000 },
+    score: { $gt: 4.0 },
+    reviews: { $gt: 10 },
     description: { $not: /account/ }
   }).limit(100)
 }

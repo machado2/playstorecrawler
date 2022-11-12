@@ -11,10 +11,7 @@ function shouldIgnore(app) {
     if (app?.score < 3) {
         return true
     }
-    if (app?.reviews < 1000) {
-        return true
-    }
-    if (app.description.includes('account')) {
+    if (app?.reviews < 10) {
         return true
     }
     return false
